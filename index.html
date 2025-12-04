@@ -7,15 +7,15 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
 
-    <!-- ✅ Use CDN for Leaflet and FontAwesome -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- ✅ CDN for Leaflet and FontAwesome -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    <!-- ✅ Keep your custom CSS -->
-    <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
-    <link rel="stylesheet" href="css/qgis2web.css">
-    <link rel="stylesheet" href="css/leaflet.photon.css">
-    <link rel="stylesheet" href="css/leaflet-measure.css">
+    <!-- ✅ Your custom CSS -->
+    <link rel="stylesheet" href="css/L.Control.Layers.Tree.css" />
+    <link rel="stylesheet" href="css/qgis2web.css" />
+    <link rel="stylesheet" href="css/leaflet.photon.css" />
+    <link rel="stylesheet" href="css/leaflet-measure.css" />
 
     <style>
         html, body, #map {
@@ -30,10 +30,10 @@
 <body>
     <div id="map"></div>
 
-    <!-- ✅ Use CDN for Leaflet JS -->
+    <!-- ✅ CDN for Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-    <!-- ✅ Keep your custom JS -->
+    <!-- ✅ Your custom JS -->
     <script src="js/qgis2web_expressions.js"></script>
     <script src="js/L.Control.Layers.Tree.min.js"></script>
     <script src="js/multi-style-layer.js"></script>
@@ -65,24 +65,87 @@
             minZoom: 1
         }).setView([-6.74, 146.99], 12); // Center on Lae
 
-        // ✅ Add OpenStreetMap tiles
+        // ✅ Add OpenStreetMap base layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // ✅ Keep your original script for layers, controls, popups, etc.
+        // ✅ Add hash for URL sync
         var hash = new L.Hash(map);
-        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> · <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> · <a href="https://qgis.org">QGIS</a>');
+
+        // ✅ Attribution
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> · <a href="https://leafletjs.com">Leaflet</a> · <a href="https://qgis.org">QGIS</a>');
 
         var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
 
-        // ✅ All your original layer and control code goes here (unchanged)
-        // ...
-        // ✅ Example: Add one layer to confirm map works
-        var layer_STUDYAREABOUNDARY_19 = new L.geoJson(json_STUDYAREABOUNDARY_19).addTo(map);
+        // ✅ Title Control
+        var title = new L.Control({position:'topleft'});
+        title.onAdd = function () {
+            var div = L.DomUtil.create('div', 'info');
+            div.innerHTML = '<h2>Basic Land Use Analysis - Lae Urban</h2>';
+            return div;
+        };
+        title.addTo(map);
 
-        // ✅ Add your overlaysTree and controls as before
-        // ...
+        // ✅ Abstract Info Control
+        var abstract = new L.Control({position:'topleft'});
+        abstract.onAdd = function () {
+            var div = L.DomUtil.create('div', 'leaflet-control abstract');
+            div.id = 'abstract';
+            div.innerHTML = 'i';
+            div.onmouseenter = function(){ div.innerHTML = 'Halo olgeta,<br><br>This web map provides some basic land use analysis of Lae.<br><br>You can turn layers on/off by ticking the box next to each one. Data comes from open sources like Copernicus and NASA DEM.<br><br>Feel free to share your thoughts, tenkyu tru!'; };
+            div.onmouseleave = function(){ div.innerHTML = 'i'; };
+            return div;
+        };
+        abstract.addTo(map);
+
+        // ✅ Zoom Control
+        L.control.zoom({position: 'topleft'}).addTo(map);
+
+        // ✅ Measure Tool
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0].className += ' fas fa-ruler';
+
+        // ✅ Bounds group
+        var bounds_group = new L.featureGroup([]);
+
+        // ✅ Add your layers (image overlays + vector layers)
+        // Example: Study Area Boundary
+        var layer_STUDYAREABOUNDARY_19 = new L.geoJson(json_STUDYAREABOUNDARY_19, {
+            style: {color: 'red', weight: 4, dashArray: '16,8'}
+        }).addTo(map);
+        bounds_group.addLayer(layer_STUDYAREABOUNDARY_19);
+
+        // ✅ Add raster layers (example: Aerial True Colour)
+        var img_AERIAL_TRUECOLOUR_10M_0 = 'data/AERIAL_TRUECOLOUR_10M_0.png';
+        var img_bounds_AERIAL_TRUECOLOUR_10M_0 = [[-6.769970266905133,146.66037702345022],[-6.533933685383704,147.06859464173226]];
+        var layer_AERIAL_TRUECOLOUR_10M_0 = new L.imageOverlay(img_AERIAL_TRUECOLOUR_10M_0, img_bounds_AERIAL_TRUECOLOUR_10M_0);
+        bounds_group.addLayer(layer_AERIAL_TRUECOLOUR_10M_0);
+        map.addLayer(layer_AERIAL_TRUECOLOUR_10M_0);
+
+        // ✅ Add other layers similarly (NDVI, UBI, contours, OSM data, etc.)
+        // Paste your original map.createPane + L.imageOverlay + L.geoJson code here for all layers.
+
+        // ✅ Layer Tree Control
+        var overlaysTree = [
+            {label: '<img src="legend/STUDYAREABOUNDARY_19.png" /> STUDY AREA BOUNDARY', layer: layer_STUDYAREABOUNDARY_19},
+            {label: 'AERIAL TRUE COLOUR', layer: layer_AERIAL_TRUECOLOUR_10M_0}
+            // Add other layers here...
+        ];
+        var lay = L.control.layers.tree(null, overlaysTree, {collapsed: true});
+        lay.addTo(map);
+
+        // ✅ Fit bounds
+        if (bounds_group.getLayers().length) {
+            map.fitBounds(bounds_group.getBounds());
+        }
     </script>
 </body>
 </html>
