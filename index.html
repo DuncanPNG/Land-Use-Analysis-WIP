@@ -116,11 +116,136 @@
         }).addTo(map);
         bounds_group.addLayer(layer_STUDYAREABOUNDARY_19);
 
-        var img_AERIAL_TRUECOLOUR_10M_0 = 'data/AERIAL_TRUECOLOUR_10M_0.png';
-        var img_bounds_AERIAL_TRUECOLOUR_10M_0 = [[-6.769970266905133,146.66037702345022],[-6.533933685383704,147.06859464173226]];
-        var layer_AERIAL_TRUECOLOUR_10M_0 = new L.imageOverlay(img_AERIAL_TRUECOLOUR_10M_0, img_bounds_AERIAL_TRUECOLOUR_10M_0);
-        bounds_group.addLayer(layer_AERIAL_TRUECOLOUR_10M_0);
-        map.addLayer(layer_AERIAL_TRUECOLOUR_10M_0);
+      map.createPane('pane_AERIAL_TRUECOLOUR_10M_0');
+map.getPane('pane_AERIAL_TRUECOLOUR_10M_0').style.zIndex = 400;
+var img_AERIAL_TRUECOLOUR_10M_0 = 'data/AERIAL_TRUECOLOUR_10M_0.png';
+var img_bounds_AERIAL_TRUECOLOUR_10M_0 = [[-6.769970266905133,146.66037702345022],[-6.533933685383704,147.06859464173226]];
+var layer_AERIAL_TRUECOLOUR_10M_0 = new L.imageOverlay(img_AERIAL_TRUECOLOUR_10M_0, img_bounds_AERIAL_TRUECOLOUR_10M_0, {pane: 'pane_AERIAL_TRUECOLOUR_10M_0'});
+bounds_group.addLayer(layer_AERIAL_TRUECOLOUR_10M_0);
+map.addLayer(layer_AERIAL_TRUECOLOUR_10M_0);
+
+map.createPane('pane_B8_INFRARED_CLIPPED_1');
+map.getPane('pane_B8_INFRARED_CLIPPED_1').style.zIndex = 401;
+var img_B8_INFRARED_CLIPPED_1 = 'data/B8_INFRARED_CLIPPED_1.png';
+var img_bounds_B8_INFRARED_CLIPPED_1 = [[-6.745998225732431,146.9315897157187],[-6.632103352752233,147.04099188341831]];
+var layer_B8_INFRARED_CLIPPED_1 = new L.imageOverlay(img_B8_INFRARED_CLIPPED_1, img_bounds_B8_INFRARED_CLIPPED_1, {pane: 'pane_B8_INFRARED_CLIPPED_1'});
+bounds_group.addLayer(layer_B8_INFRARED_CLIPPED_1);
+map.addLayer(layer_B8_INFRARED_CLIPPED_1);
+
+map.createPane('pane_B2_BLUE_RGB_CLIPPED_2');
+map.getPane('pane_B2_BLUE_RGB_CLIPPED_2').style.zIndex = 402;
+var img_B2_BLUE_RGB_CLIPPED_2 = 'data/B2_BLUE_RGB_CLIPPED_2.png';
+var img_bounds_B2_BLUE_RGB_CLIPPED_2 = [[-6.745998225732431,146.9315897157187],[-6.632103352752233,147.04099188341831]];
+var layer_B2_BLUE_RGB_CLIPPED_2 = new L.imageOverlay(img_B2_BLUE_RGB_CLIPPED_2, img_bounds_B2_BLUE_RGB_CLIPPED_2, {pane: 'pane_B2_BLUE_RGB_CLIPPED_2'});
+bounds_group.addLayer(layer_B2_BLUE_RGB_CLIPPED_2);
+map.addLayer(layer_B2_BLUE_RGB_CLIPPED_2);
+
+map.createPane('pane_B3_GREEN_RGB_CLIPPED_3');
+map.getPane('pane_B3_GREEN_RGB_CLIPPED_3').style.zIndex = 403;
+var img_B3_GREEN_RGB_CLIPPED_3 = 'data/B3_GREEN_RGB_CLIPPED_3.png';
+var img_bounds_B3_GREEN_RGB_CLIPPED_3 = [[-6.745998225732431,146.9315897157187],[-6.632103352752233,147.04099188341831]];
+var layer_B3_GREEN_RGB_CLIPPED_3 = new L.imageOverlay(img_B3_GREEN_RGB_CLIPPED_3, img_bounds_B3_GREEN_RGB_CLIPPED_3, {pane: 'pane_B3_GREEN_RGB_CLIPPED_3'});
+bounds_group.addLayer(layer_B3_GREEN_RGB_CLIPPED_3);
+map.addLayer(layer_B3_GREEN_RGB_CLIPPED_3);
+
+map.createPane('pane_B4_RED_RGB_CLIPPED_4');
+map.getPane('pane_B4_RED_RGB_CLIPPED_4').style.zIndex = 404;
+var img_B4_RED_RGB_CLIPPED_4 = 'data/B4_RED_RGB_CLIPPED_4.png';
+var img_bounds_B4_RED_RGB_CLIPPED_4 = [[-6.745998225732431,146.9315897157187],[-6.632103352752233,147.04099188341831]];
+var layer_B4_RED_RGB_CLIPPED_4 = new L.imageOverlay(img_B4_RED_RGB_CLIPPED_4, img_bounds_B4_RED_RGB_CLIPPED_4, {pane: 'pane_B4_RED_RGB_CLIPPED_4'});
+bounds_group.addLayer(layer_B4_RED_RGB_CLIPPED_4);
+map.addLayer(layer_B4_RED_RGB_CLIPPED_4);
+
+// --- Analysis Layers ---
+map.createPane('pane_SimpleRGBRatioSR_5');
+map.getPane('pane_SimpleRGBRatioSR_5').style.zIndex = 405;
+var img_SimpleRGBRatioSR_5 = 'data/SimpleRGBRatioSR_5.png';
+var img_bounds_SimpleRGBRatioSR_5 = [[-6.7459668248462314,146.93159505979634],[-6.6321353061555115,147.04093616002294]];
+var layer_SimpleRGBRatioSR_5 = new L.imageOverlay(img_SimpleRGBRatioSR_5, img_bounds_SimpleRGBRatioSR_5, {pane: 'pane_SimpleRGBRatioSR_5'});
+bounds_group.addLayer(layer_SimpleRGBRatioSR_5);
+map.addLayer(layer_SimpleRGBRatioSR_5);
+
+map.createPane('pane_GreenChlorophyllIndexGCI_6');
+map.getPane('pane_GreenChlorophyllIndexGCI_6').style.zIndex = 406;
+var img_GreenChlorophyllIndexGCI_6 = 'data/GreenChlorophyllIndexGCI_6.png';
+var img_bounds_GreenChlorophyllIndexGCI_6 = [[-6.7459668248462314,146.93159505979634],[-6.6321353061555115,147.04093616002294]];
+var layer_GreenChlorophyllIndexGCI_6 = new L.imageOverlay(img_GreenChlorophyllIndexGCI_6, img_bounds_GreenChlorophyllIndexGCI_6, {pane: 'pane_GreenChlorophyllIndexGCI_6'});
+bounds_group.addLayer(layer_GreenChlorophyllIndexGCI_6);
+map.addLayer(layer_GreenChlorophyllIndexGCI_6);
+
+map.createPane('pane_NormalisedDifferenceVegetationIndexNDVI_7');
+map.getPane('pane_NormalisedDifferenceVegetationIndexNDVI_7').style.zIndex = 407;
+var img_NormalisedDifferenceVegetationIndexNDVI_7 = 'data/NormalisedDifferenceVegetationIndexNDVI_7.png';
+var img_bounds_NormalisedDifferenceVegetationIndexNDVI_7 = [[-6.7459556299333565,146.93158634883304],[-6.632136881964176,147.04093242842123]];
+var layer_NormalisedDifferenceVegetationIndexNDVI_7 = new L.imageOverlay(img_NormalisedDifferenceVegetationIndexNDVI_7, img_bounds_NormalisedDifferenceVegetationIndexNDVI_7, {pane: 'pane_NormalisedDifferenceVegetationIndexNDVI_7'});
+bounds_group.addLayer(layer_NormalisedDifferenceVegetationIndexNDVI_7);
+map.addLayer(layer_NormalisedDifferenceVegetationIndexNDVI_7);
+
+map.createPane('pane_NormalisedDifferenceWaterIndexNDWI_8');
+map.getPane('pane_NormalisedDifferenceWaterIndexNDWI_8').style.zIndex = 408;
+var img_NormalisedDifferenceWaterIndexNDWI_8 = 'data/NormalisedDifferenceWaterIndexNDWI_8.png';
+var img_bounds_NormalisedDifferenceWaterIndexNDWI_8 = [[-6.7459556299333565,146.93158634883304],[-6.632136881964176,147.04093242842123]];
+var layer_NormalisedDifferenceWaterIndexNDWI_8 = new L.imageOverlay(img_NormalisedDifferenceWaterIndexNDWI_8, img_bounds_NormalisedDifferenceWaterIndexNDWI_8, {pane: 'pane_NormalisedDifferenceWaterIndexNDWI_8'});
+bounds_group.addLayer(layer_NormalisedDifferenceWaterIndexNDWI_8);
+map.addLayer(layer_NormalisedDifferenceWaterIndexNDWI_8);
+
+map.createPane('pane_UrbanBuiltIndexUBI_9');
+map.getPane('pane_UrbanBuiltIndexUBI_9').style.zIndex = 409;
+var img_UrbanBuiltIndexUBI_9 = 'data/UrbanBuiltIndexUBI_9.png';
+var img_bounds_UrbanBuiltIndexUBI_9 = [[-6.745966454626388,146.9316145352717],[-6.632123290391205,147.04095803130514]];
+var layer_UrbanBuiltIndexUBI_9 = new L.imageOverlay(img_UrbanBuiltIndexUBI_9, img_bounds_UrbanBuiltIndexUBI_9, {pane: 'pane_UrbanBuiltIndexUBI_9'});
+bounds_group.addLayer(layer_UrbanBuiltIndexUBI_9);
+map.addLayer(layer_UrbanBuiltIndexUBI_9);
+
+// --- DEM & Floodplain ---
+map.createPane('pane_NASA_DEM_30M_16');
+map.getPane('pane_NASA_DEM_30M_16').style.zIndex = 416;
+var img_NASA_DEM_30M_16 = 'data/NASA_DEM_30M_16.png';
+var img_bounds_NASA_DEM_30M_16 = [[-6.745941872920377,146.93162450567303],[-6.632145507865763,147.04091696482195]];
+var layer_NASA_DEM_30M_16 = new L.imageOverlay(img_NASA_DEM_30M_16, img_bounds_NASA_DEM_30M_16, {pane: 'pane_NASA_DEM_30M_16'});
+bounds_group.addLayer(layer_NASA_DEM_30M_16);
+map.addLayer(layer_NASA_DEM_30M_16);
+
+map.createPane('pane_5M_FLOODPLAIN_CLIPPED_18');
+map.getPane('pane_5M_FLOODPLAIN_CLIPPED_18').style.zIndex = 418;
+var img_5M_FLOODPLAIN_CLIPPED_18 = 'data/5M_FLOODPLAIN_CLIPPED_18.png';
+var img_bounds_5M_FLOODPLAIN_CLIPPED_18 = [[-6.746049507865139,146.93138916952648],[-6.631895179982202,147.04111139169046]];
+var layer_5M_FLOODPLAIN_CLIPPED_18 = new L.imageOverlay(img_5M_FLOODPLAIN_CLIPPED_18, img_bounds_5M_FLOODPLAIN_CLIPPED_18, {pane: 'pane_5M_FLOODPLAIN_CLIPPED_18'});
+bounds_group.addLayer(layer_5M_FLOODPLAIN_CLIPPED_18);
+map.addLayer(layer_5M_FLOODPLAIN_CLIPPED_18);
+
+// --- Vector Layers ---
+var layer_50M_Contour_NASA_DEM_10 = new L.geoJson(json_50M_Contour_NASA_DEM_10, {style: {color: 'orange', weight: 2}});
+bounds_group.addLayer(layer_50M_Contour_NASA_DEM_10);
+map.addLayer(layer_50M_Contour_NASA_DEM_10);
+
+var layer_20M_Contour_NASA_DEM_11 = new L.geoJson(json_20M_Contour_NASA_DEM_11, {style: {color: 'orange', weight: 1}});
+bounds_group.addLayer(layer_20M_Contour_NASA_DEM_11);
+map.addLayer(layer_20M_Contour_NASA_DEM_11);
+
+var layer_LAE_CADASTRAL_2010_NO_DATUM_12 = new L.geoJson(json_LAE_CADASTRAL_2010_NO_DATUM_12, {style: {color: 'yellow', weight: 1}});
+bounds_group.addLayer(layer_LAE_CADASTRAL_2010_NO_DATUM_12);
+map.addLayer(layer_LAE_CADASTRAL_2010_NO_DATUM_12);
+
+var layer_WATERWAYS_OSM_CLIPPED_13 = new L.geoJson(json_WATERWAYS_OSM_CLIPPED_13, {style: {color: 'blue', weight: 1}});
+bounds_group.addLayer(layer_WATERWAYS_OSM_CLIPPED_13);
+map.addLayer(layer_WATERWAYS_OSM_CLIPPED_13);
+
+var layer_BASIC_ROAD_OSM_CLIPPED_14 = new L.geoJson.multiStyle(json_BASIC_ROAD_OSM_CLIPPED_14, {
+    styles: [
+        function(){ return {color: 'black', weight: 4}; },
+        function(){ return {color: '#eee', weight: 3}; }
+    ]
+});
+bounds_group.addLayer(layer_BASIC_ROAD_OSM_CLIPPED_14);
+map.addLayer(layer_BASIC_ROAD_OSM_CLIPPED_14);
+
+var layer_BUILDINGS_OSM_CLIPPED_15 = new L.geoJson(json_BUILDINGS_OSM_CLIPPED_15, {style: {color: 'black', fillColor: 'black', fillOpacity: 1}});
+bounds_group.addLayer(layer_BUILDINGS_OSM_CLIPPED_15);
+map.addLayer(layer_BUILDINGS_OSM_CLIPPED_15);
+
+var layer_FLOWPATHSOLFP_17 = new L.geoJson(json_FLOWPATHSOLFP_17, {style: {color: '#cee6f7', weight: 4}});
+bounds_group.addLayer(layer_FLOWPATHSOLFP_17);
 
         // ✅ Add other layers (NDVI, UBI, contours, OSM data, etc.) using your original code
 
