@@ -7,7 +7,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
 
-    <!-- ✅ CDN for Leaflet and FontAwesome -->
+    <!-- ✅ Leaflet & FontAwesome from CDN -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
@@ -30,7 +30,7 @@
 <body>
     <div id="map"></div>
 
-    <!-- ✅ CDN for Leaflet JS -->
+    <!-- ✅ Leaflet JS from CDN -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <!-- ✅ Your custom JS -->
@@ -63,22 +63,19 @@
             zoomControl: false,
             maxZoom: 28,
             minZoom: 1
-        }).setView([-6.74, 146.99], 12); // Center on Lae
+        }).setView([-6.74, 146.99], 12);
 
-        // ✅ Add OpenStreetMap base layer
+        // ✅ Base map
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // ✅ Add hash for URL sync
         var hash = new L.Hash(map);
-
-        // ✅ Attribution
         map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> · <a href="https://leafletjs.com">Leaflet</a> · <a href="https://qgis.org">QGIS</a>');
 
         var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
 
-        // ✅ Title Control
+        // ✅ Title
         var title = new L.Control({position:'topleft'});
         title.onAdd = function () {
             var div = L.DomUtil.create('div', 'info');
@@ -87,7 +84,7 @@
         };
         title.addTo(map);
 
-        // ✅ Abstract Info Control
+        // ✅ Abstract Info
         var abstract = new L.Control({position:'topleft'});
         abstract.onAdd = function () {
             var div = L.DomUtil.create('div', 'leaflet-control abstract');
@@ -99,10 +96,8 @@
         };
         abstract.addTo(map);
 
-        // ✅ Zoom Control
+        // ✅ Zoom & Measure
         L.control.zoom({position: 'topleft'}).addTo(map);
-
-        // ✅ Measure Tool
         var measureControl = new L.Control.Measure({
             position: 'topleft',
             primaryLengthUnit: 'meters',
@@ -113,36 +108,31 @@
         measureControl.addTo(map);
         document.getElementsByClassName('leaflet-control-measure-toggle')[0].className += ' fas fa-ruler';
 
-        // ✅ Bounds group
         var bounds_group = new L.featureGroup([]);
 
-        // ✅ Add your layers (image overlays + vector layers)
-        // Example: Study Area Boundary
+        // ✅ Layers
         var layer_STUDYAREABOUNDARY_19 = new L.geoJson(json_STUDYAREABOUNDARY_19, {
             style: {color: 'red', weight: 4, dashArray: '16,8'}
         }).addTo(map);
         bounds_group.addLayer(layer_STUDYAREABOUNDARY_19);
 
-        // ✅ Add raster layers (example: Aerial True Colour)
         var img_AERIAL_TRUECOLOUR_10M_0 = 'data/AERIAL_TRUECOLOUR_10M_0.png';
         var img_bounds_AERIAL_TRUECOLOUR_10M_0 = [[-6.769970266905133,146.66037702345022],[-6.533933685383704,147.06859464173226]];
         var layer_AERIAL_TRUECOLOUR_10M_0 = new L.imageOverlay(img_AERIAL_TRUECOLOUR_10M_0, img_bounds_AERIAL_TRUECOLOUR_10M_0);
         bounds_group.addLayer(layer_AERIAL_TRUECOLOUR_10M_0);
         map.addLayer(layer_AERIAL_TRUECOLOUR_10M_0);
 
-        // ✅ Add other layers similarly (NDVI, UBI, contours, OSM data, etc.)
-        // Paste your original map.createPane + L.imageOverlay + L.geoJson code here for all layers.
+        // ✅ Add other layers (NDVI, UBI, contours, OSM data, etc.) using your original code
 
-        // ✅ Layer Tree Control
+        // ✅ Layer Tree
         var overlaysTree = [
-            {label: '<img src="legend/STUDYAREABOUNDARY_19.png" /> STUDY AREA BOUNDARY', layer: layer_STUDYAREABOUNDARY_19},
-            {label: 'AERIAL TRUE COLOUR', layer: layer_AERIAL_TRUECOLOUR_10M_0}
+            {label: 'Study Area Boundary', layer: layer_STUDYAREABOUNDARY_19},
+            {label: 'Aerial True Colour', layer: layer_AERIAL_TRUECOLOUR_10M_0}
             // Add other layers here...
         ];
         var lay = L.control.layers.tree(null, overlaysTree, {collapsed: true});
         lay.addTo(map);
 
-        // ✅ Fit bounds
         if (bounds_group.getLayers().length) {
             map.fitBounds(bounds_group.getBounds());
         }
