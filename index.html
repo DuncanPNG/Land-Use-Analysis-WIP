@@ -1,23 +1,57 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
-        <meta name="mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <link rel="stylesheet" href="css/leaflet.css">
-        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
-        <link rel="stylesheet" href="css/qgis2web.css">
-        <link rel="stylesheet" href="css/fontawesome-all.min.css">
-        <link rel="stylesheet" href="css/leaflet.photon.css">
-        <link rel="stylesheet" href="css/leaflet-measure.css">
-        <style>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" href="css/leaflet.css">
+    <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+    <link rel="stylesheet" href="css/qgis2web.css">
+    <link rel="stylesheet" href="css/fontawesome-all.min.css">
+    <link rel="stylesheet" href="css/leaflet.photon.css">
+    <link rel="stylesheet" href="css/leaflet-measure.css">
+    <style>
         html, body, #map {
             width: 100%;
             height: 100%;
-            padding: 0;
-            margin: 0;
+        }
+    </style>
+    <title>Basic Land Use Analysis - Lae Urban</title>
+</head>
+<body>
+    <div id="map"></div>
+
+    <!-- Scripts -->
+    <script src="js/qgis2web_expressions.js"></script>
+    <script src="js/leaflet.js"></script>
+    <script src="js/L.Control.Layers.Tree.min.js"></script>
+    <script src="js/multi-style-layer.js"></script>
+    <script src="js/leaflet.rotatedMarker.js"></script>
+    <script src="js/leaflet.pattern.js"></script>
+    <script src="js/leaflet-hash.js"></script>
+    <script src="js/Autolinker.min.js"></script>
+    <script src="js/rbush.min.js"></script>
+    <script src="js/labelgun.min.js"></script>
+    <script src="js/labels.js"></script>
+    <script src="js/leaflet.photon.js"></script>
+    <script src="js/leaflet-measure.js"></script>
+    <script src="data/50M_Contour_NASA_DEM_10.js"></script>
+    <script src="data/20M_Contour_NASA_DEM_11.js"></script>
+    <script src="data/LAE_CADASTRAL_2010_NO_DATUM_12.js"></script>
+    <script src="data/WATERWAYS_OSM_CLIPPED_13.js"></script>
+    <script src="data/BASIC_ROAD_OSM_CLIPPED_14.js"></script>
+    <script src="data/BUILDINGS_OSM_CLIPPED_15.js"></script>
+    <script src="data/FLOWPATHSOLFP_17.js"></script>
+    <script src="data/STUDYAREABOUNDARY_19.js"></script>
+
+    <script>
+        
+        var map = L.map('map', {
+            zoomControl: false,
+            maxZoom: 28,
+            minZoom: 1
         }
         </style>
         <title>Basic Land Use Analysis - Lae Urban </title>
