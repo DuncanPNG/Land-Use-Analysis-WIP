@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -71,8 +72,6 @@
         }).addTo(map);
 
         var hash = new L.Hash(map);
-        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> · <a href="https://leafletjs.com">Leaflet</a> · <a href="https://qgis.org">QGIS</a>');
-
         var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
 
         // ✅ Title
@@ -110,19 +109,13 @@
 
         var bounds_group = new L.featureGroup([]);
 
-        // ✅ Layers
-        var layer_STUDYAREABOUNDARY_19 = new L.geoJson(json_STUDYAREABOUNDARY_19, {
-            style: {color: 'red', weight: 4, dashArray: '16,8'}
-        }).addTo(map);
-        bounds_group.addLayer(layer_STUDYAREABOUNDARY_19);
-
-      map.createPane('pane_AERIAL_TRUECOLOUR_10M_0');
-map.getPane('pane_AERIAL_TRUECOLOUR_10M_0').style.zIndex = 400;
-var img_AERIAL_TRUECOLOUR_10M_0 = 'data/AERIAL_TRUECOLOUR_10M_0.png';
-var img_bounds_AERIAL_TRUECOLOUR_10M_0 = [[-6.769970266905133,146.66037702345022],[-6.533933685383704,147.06859464173226]];
-var layer_AERIAL_TRUECOLOUR_10M_0 = new L.imageOverlay(img_AERIAL_TRUECOLOUR_10M_0, img_bounds_AERIAL_TRUECOLOUR_10M_0, {pane: 'pane_AERIAL_TRUECOLOUR_10M_0'});
-bounds_group.addLayer(layer_AERIAL_TRUECOLOUR_10M_0);
-map.addLayer(layer_AERIAL_TRUECOLOUR_10M_0);
+        map.createPane('pane_AERIAL_TRUECOLOUR_10M_0');
+        map.getPane('pane_AERIAL_TRUECOLOUR_10M_0').style.zIndex = 400;
+        var img_AERIAL_TRUECOLOUR_10M_0 = 'data/AERIAL_TRUECOLOUR_10M_0.png';
+        var img_bounds_AERIAL_TRUECOLOUR_10M_0 = [[-6.769970266905133,146.66037702345022],[-6.533933685383704,147.06859464173226]];
+        var layer_AERIAL_TRUECOLOUR_10M_0 = new L.imageOverlay(img_AERIAL_TRUECOLOUR_10M_0, img_bounds_AERIAL_TRUECOLOUR_10M_0, {pane: 'pane_AERIAL_TRUECOLOUR_10M_0'});
+        bounds_group.addLayer(layer_AERIAL_TRUECOLOUR_10M_0);
+        map.addLayer(layer_AERIAL_TRUECOLOUR_10M_0);
 
 map.createPane('pane_B8_INFRARED_CLIPPED_1');
 map.getPane('pane_B8_INFRARED_CLIPPED_1').style.zIndex = 401;
@@ -247,13 +240,17 @@ map.addLayer(layer_BUILDINGS_OSM_CLIPPED_15);
 var layer_FLOWPATHSOLFP_17 = new L.geoJson(json_FLOWPATHSOLFP_17, {style: {color: '#cee6f7', weight: 4}});
 bounds_group.addLayer(layer_FLOWPATHSOLFP_17);
 
-        // ✅ Add other layers (NDVI, UBI, contours, OSM data, etc.) using your original code
-
-        // ✅ Layer Tree
+        // ✅ Legend Tree
         var overlaysTree = [
             {label: 'Study Area Boundary', layer: layer_STUDYAREABOUNDARY_19},
-            {label: 'Aerial True Colour', layer: layer_AERIAL_TRUECOLOUR_10M_0}
-            // Add other layers here...
+            {label: 'Aerial True Colour', layer: layer_AERIAL_TRUECOLOUR_10M_0},
+            {label: 'NDVI', layer: layer_NormalisedDifferenceVegetationIndexNDVI_7},
+            {label: 'UBI', layer: layer_UrbanBuiltIndexUBI_9},
+            {label: 'Floodplain', layer: layer_5M_FLOODPLAIN_CLIPPED_18},
+            {label: 'OSM Roads', layer: layer_BASIC_ROAD_OSM_CLIPPED_14},
+            {label: 'OSM Buildings', layer: layer_BUILDINGS_OSM_CLIPPED_15},
+            {label: 'Contours 20m', layer: layer_20M_Contour_NASA_DEM_11},
+            {label: 'Contours 50m', layer: layer_50M_Contour_NASA_DEM_10}
         ];
         var lay = L.control.layers.tree(null, overlaysTree, {collapsed: true});
         lay.addTo(map);
