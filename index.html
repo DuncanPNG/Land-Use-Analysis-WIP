@@ -1,71 +1,769 @@
 <!doctype html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
-    <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
-    <link rel="stylesheet" href="css/qgis2web.css">
-    <link rel="stylesheet" href="css/fontawesome-all.min.css">
-    <link rel="stylesheet" href="css/leaflet.photon.css">
-    <link rel="stylesheet" href="css/leaflet-measure.css">
-
-    <style>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet.photon.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
         html, body, #map {
             width: 100%;
             height: 100%;
-            margin: 0;
             padding: 0;
+            margin: 0;
         }
-    </style>
-    <title>Basic Land Use Analysis - Lae Urban</title>
-</head>
-<body>
-    <div id="map"></div>
-
-        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-   
-    <script src="js/qgis2web_expressions.js"></script>
-    <script src="js/L.Control.Layers.Tree.min.js"></script>
-    <script src="js/multi-style-layer.js"></script>
-    <script src="js/leaflet.rotatedMarker.js"></script>
-    <script src="js/leaflet.pattern.js"></script>
-    <script src="js/leaflet-hash.js"></script>
-    <script src="js/Autolinker.min.js"></script>
-    <script src="js/rbush.min.js"></script>
-    <script src="js/labelgun.min.js"></script>
-    <script src="js/labels.js"></script>
-    <script src="js/leaflet.photon.js"></script>
-    <script src="js/leaflet-measure.js"></script>
-
-  
-    <script src="data/50M_Contour_NASA_DEM_10.js"></script>
-    <script src="data/20M_Contour_NASA_DEM_11.js"></script>
-    <script src="data/LAE_CADASTRAL_2010_NO_DATUM_12.js"></script>
-    <script src="data/WATERWAYS_OSM_CLIPPED_13.js"></script>
-    <script src="data/BASIC_ROAD_OSM_CLIPPED_14.js"></script>
-    <script src="data/BUILDINGS_OSM_CLIPPED_15.js"></script>
-    <script src="data/FLOWPATHSOLFP_17.js"></script>
-    <script src="data/STUDYAREABOUNDARY_19.js"></script>
-
-    <script>
+        </style>
+        <title>Basic Land Use Analysis - Lae Urban </title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/multi-style-layer.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet.photon.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="data/50M_Contour_NASA_DEM_10.js"></script>
+        <script src="data/20M_Contour_NASA_DEM_11.js"></script>
+        <script src="data/LAE_CADASTRAL_2010_NO_DATUM_12.js"></script>
+        <script src="data/WATERWAYS_OSM_CLIPPED_13.js"></script>
+        <script src="data/BASIC_ROAD_OSM_CLIPPED_14.js"></script>
+        <script src="data/BUILDINGS_OSM_CLIPPED_15.js"></script>
+        <script src="data/FLOWPATHSOLFP_17.js"></script>
+        <script src="data/STUDYAREABOUNDARY_19.js"></script>
+        <script>
         var map = L.map('map', {
-            zoomControl: false,
-            maxZoom: 28,
-            minZoom: 1
-        });
-
-       
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
+            zoomControl:false, maxZoom:28, minZoom:1
+        })
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        // modify popup if contains media
+        function addClassToPopupIfMedia(content, popup) {
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = content;
+            var imgTd = tempDiv.querySelector('td img');
+            if (imgTd) {
+                var src = imgTd.getAttribute('src');
+                if (/\.(jpg|jpeg|png|gif|bmp|webp|avif)$/i.test(src)) {
+                    popup._contentNode.classList.add('media');
+                    setTimeout(function() {
+                        popup.update();
+                    }, 10);
+                } else if (/\.(mp3|wav|ogg|aac)$/i.test(src)) {
+                    var audio = document.createElement('audio');
+                    audio.controls = true;
+                    audio.src = src;
+                    imgTd.parentNode.replaceChild(audio, imgTd);
+                    popup._contentNode.classList.add('media');
+                    setTimeout(function() {
+                        popup.setContent(tempDiv.innerHTML);
+                        popup.update();
+                    }, 10);
+                } else if (/\.(mp4|webm|ogg|mov)$/i.test(src)) {
+                    var video = document.createElement('video');
+                    video.controls = true;
+                    video.src = src;
+                    video.style.width = "400px";
+                    video.style.height = "300px";
+                    video.style.maxHeight = "60vh";
+                    video.style.maxWidth = "60vw";
+                    imgTd.parentNode.replaceChild(video, imgTd);
+                    popup._contentNode.classList.add('media');
+                    // Aggiorna il popup quando il video carica i metadati
+                    video.addEventListener('loadedmetadata', function() {
+                        popup.update();
+                    });
+                    setTimeout(function() {
+                        popup.setContent(tempDiv.innerHTML);
+                        popup.update();
+                    }, 10);
+                } else {
+                    popup._contentNode.classList.remove('media');
+                }
+            } else {
+                popup._contentNode.classList.remove('media');
+            }
+        }
+        var title = new L.Control({'position':'topleft'});
+        title.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'info');
+            this.update();
+            return this._div;
+        };
+        title.update = function () {
+            this._div.innerHTML = '<h2>Basic Land Use Analysis - Lae Urban </h2>';
+        };
+        title.addTo(map);
+        var abstract = new L.Control({'position':'topleft'});
+        abstract.onAdd = function (map) {
+            this._div = L.DomUtil.create('div',
+            'leaflet-control abstract');
+            this._div.id = 'abstract'
+                this._div.setAttribute("onmouseenter", "abstract.show()");
+                this._div.setAttribute("onmouseleave", "abstract.hide()");
+                this.hide();
+                return this._div;
+            };
+            abstract.hide = function () {
+                this._div.classList.remove("abstractUncollapsed");
+                this._div.classList.add("abstract");
+                this._div.innerHTML = 'i'
+            }
+            abstract.show = function () {
+                this._div.classList.remove("abstract");
+                this._div.classList.add("abstractUncollapsed");
+                this._div.innerHTML = 'Halo olgeta, <br /><br />This web map provides some basic land use analysis of Lae. <br /><br />You can turn layers on/off by ticking the box next to each one. The data comes from various open-sources, such as aerial imagery from Copernicus and NASA’s Digital Elevation Model (DEM). For a normal aerial photograph, turn on the layer called True Colour.<br /><br />Measurements like “10m” show the accuracy of the data. For example, the DEM has a 30m accuracy, in other words it is low quality.Therefore, the hydrology analysis appears to be pixelated. More detailed analysis needs higher-quality surveys.<br /><br />Feel free to share your thoughts, tenkyu tru!';
+        };
+        abstract.addTo(map);
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
         }).addTo(map);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0].innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0].className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+            if (bounds_group.getLayers().length) {
+                map.fitBounds(bounds_group.getBounds());
+            }
+        }
+        map.createPane('pane_AERIAL_TRUECOLOUR_10M_0');
+        map.getPane('pane_AERIAL_TRUECOLOUR_10M_0').style.zIndex = 400;
+        var img_AERIAL_TRUECOLOUR_10M_0 = 'data/AERIAL_TRUECOLOUR_10M_0.png';
+        var img_bounds_AERIAL_TRUECOLOUR_10M_0 = [[-6.769970266905133,146.66037702345022],[-6.533933685383704,147.06859464173226]];
+        var layer_AERIAL_TRUECOLOUR_10M_0 = new L.imageOverlay(img_AERIAL_TRUECOLOUR_10M_0,
+                                              img_bounds_AERIAL_TRUECOLOUR_10M_0,
+                                              {pane: 'pane_AERIAL_TRUECOLOUR_10M_0'});
+        bounds_group.addLayer(layer_AERIAL_TRUECOLOUR_10M_0);
+        map.addLayer(layer_AERIAL_TRUECOLOUR_10M_0);
+        map.createPane('pane_B8_INFRARED_CLIPPED_1');
+        map.getPane('pane_B8_INFRARED_CLIPPED_1').style.zIndex = 401;
+        var img_B8_INFRARED_CLIPPED_1 = 'data/B8_INFRARED_CLIPPED_1.png';
+        var img_bounds_B8_INFRARED_CLIPPED_1 = [[-6.745998225732431,146.9315897157187],[-6.632103352752233,147.04099188341831]];
+        var layer_B8_INFRARED_CLIPPED_1 = new L.imageOverlay(img_B8_INFRARED_CLIPPED_1,
+                                              img_bounds_B8_INFRARED_CLIPPED_1,
+                                              {pane: 'pane_B8_INFRARED_CLIPPED_1'});
+        bounds_group.addLayer(layer_B8_INFRARED_CLIPPED_1);
+        map.addLayer(layer_B8_INFRARED_CLIPPED_1);
+        map.createPane('pane_B2_BLUE_RGB_CLIPPED_2');
+        map.getPane('pane_B2_BLUE_RGB_CLIPPED_2').style.zIndex = 402;
+        var img_B2_BLUE_RGB_CLIPPED_2 = 'data/B2_BLUE_RGB_CLIPPED_2.png';
+        var img_bounds_B2_BLUE_RGB_CLIPPED_2 = [[-6.745998225732431,146.9315897157187],[-6.632103352752233,147.04099188341831]];
+        var layer_B2_BLUE_RGB_CLIPPED_2 = new L.imageOverlay(img_B2_BLUE_RGB_CLIPPED_2,
+                                              img_bounds_B2_BLUE_RGB_CLIPPED_2,
+                                              {pane: 'pane_B2_BLUE_RGB_CLIPPED_2'});
+        bounds_group.addLayer(layer_B2_BLUE_RGB_CLIPPED_2);
+        map.addLayer(layer_B2_BLUE_RGB_CLIPPED_2);
+        map.createPane('pane_B3_GREEN_RGB_CLIPPED_3');
+        map.getPane('pane_B3_GREEN_RGB_CLIPPED_3').style.zIndex = 403;
+        var img_B3_GREEN_RGB_CLIPPED_3 = 'data/B3_GREEN_RGB_CLIPPED_3.png';
+        var img_bounds_B3_GREEN_RGB_CLIPPED_3 = [[-6.745998225732431,146.9315897157187],[-6.632103352752233,147.04099188341831]];
+        var layer_B3_GREEN_RGB_CLIPPED_3 = new L.imageOverlay(img_B3_GREEN_RGB_CLIPPED_3,
+                                              img_bounds_B3_GREEN_RGB_CLIPPED_3,
+                                              {pane: 'pane_B3_GREEN_RGB_CLIPPED_3'});
+        bounds_group.addLayer(layer_B3_GREEN_RGB_CLIPPED_3);
+        map.addLayer(layer_B3_GREEN_RGB_CLIPPED_3);
+        map.createPane('pane_B4_RED_RGB_CLIPPED_4');
+        map.getPane('pane_B4_RED_RGB_CLIPPED_4').style.zIndex = 404;
+        var img_B4_RED_RGB_CLIPPED_4 = 'data/B4_RED_RGB_CLIPPED_4.png';
+        var img_bounds_B4_RED_RGB_CLIPPED_4 = [[-6.745998225732431,146.9315897157187],[-6.632103352752233,147.04099188341831]];
+        var layer_B4_RED_RGB_CLIPPED_4 = new L.imageOverlay(img_B4_RED_RGB_CLIPPED_4,
+                                              img_bounds_B4_RED_RGB_CLIPPED_4,
+                                              {pane: 'pane_B4_RED_RGB_CLIPPED_4'});
+        bounds_group.addLayer(layer_B4_RED_RGB_CLIPPED_4);
+        map.addLayer(layer_B4_RED_RGB_CLIPPED_4);
+        map.createPane('pane_SimpleRGBRatioSR_5');
+        map.getPane('pane_SimpleRGBRatioSR_5').style.zIndex = 405;
+        var img_SimpleRGBRatioSR_5 = 'data/SimpleRGBRatioSR_5.png';
+        var img_bounds_SimpleRGBRatioSR_5 = [[-6.7459668248462314,146.93159505979634],[-6.6321353061555115,147.04093616002294]];
+        var layer_SimpleRGBRatioSR_5 = new L.imageOverlay(img_SimpleRGBRatioSR_5,
+                                              img_bounds_SimpleRGBRatioSR_5,
+                                              {pane: 'pane_SimpleRGBRatioSR_5'});
+        bounds_group.addLayer(layer_SimpleRGBRatioSR_5);
+        map.addLayer(layer_SimpleRGBRatioSR_5);
+        map.createPane('pane_GreenChlorophyllIndexGCI_6');
+        map.getPane('pane_GreenChlorophyllIndexGCI_6').style.zIndex = 406;
+        var img_GreenChlorophyllIndexGCI_6 = 'data/GreenChlorophyllIndexGCI_6.png';
+        var img_bounds_GreenChlorophyllIndexGCI_6 = [[-6.7459668248462314,146.93159505979634],[-6.6321353061555115,147.04093616002294]];
+        var layer_GreenChlorophyllIndexGCI_6 = new L.imageOverlay(img_GreenChlorophyllIndexGCI_6,
+                                              img_bounds_GreenChlorophyllIndexGCI_6,
+                                              {pane: 'pane_GreenChlorophyllIndexGCI_6'});
+        bounds_group.addLayer(layer_GreenChlorophyllIndexGCI_6);
+        map.addLayer(layer_GreenChlorophyllIndexGCI_6);
+        map.createPane('pane_NormalisedDifferenceVegetationIndexNDVI_7');
+        map.getPane('pane_NormalisedDifferenceVegetationIndexNDVI_7').style.zIndex = 407;
+        var img_NormalisedDifferenceVegetationIndexNDVI_7 = 'data/NormalisedDifferenceVegetationIndexNDVI_7.png';
+        var img_bounds_NormalisedDifferenceVegetationIndexNDVI_7 = [[-6.7459556299333565,146.93158634883304],[-6.632136881964176,147.04093242842123]];
+        var layer_NormalisedDifferenceVegetationIndexNDVI_7 = new L.imageOverlay(img_NormalisedDifferenceVegetationIndexNDVI_7,
+                                              img_bounds_NormalisedDifferenceVegetationIndexNDVI_7,
+                                              {pane: 'pane_NormalisedDifferenceVegetationIndexNDVI_7'});
+        bounds_group.addLayer(layer_NormalisedDifferenceVegetationIndexNDVI_7);
+        map.addLayer(layer_NormalisedDifferenceVegetationIndexNDVI_7);
+        map.createPane('pane_NormalisedDifferenceWaterIndexNDWI_8');
+        map.getPane('pane_NormalisedDifferenceWaterIndexNDWI_8').style.zIndex = 408;
+        var img_NormalisedDifferenceWaterIndexNDWI_8 = 'data/NormalisedDifferenceWaterIndexNDWI_8.png';
+        var img_bounds_NormalisedDifferenceWaterIndexNDWI_8 = [[-6.7459556299333565,146.93158634883304],[-6.632136881964176,147.04093242842123]];
+        var layer_NormalisedDifferenceWaterIndexNDWI_8 = new L.imageOverlay(img_NormalisedDifferenceWaterIndexNDWI_8,
+                                              img_bounds_NormalisedDifferenceWaterIndexNDWI_8,
+                                              {pane: 'pane_NormalisedDifferenceWaterIndexNDWI_8'});
+        bounds_group.addLayer(layer_NormalisedDifferenceWaterIndexNDWI_8);
+        map.addLayer(layer_NormalisedDifferenceWaterIndexNDWI_8);
+        map.createPane('pane_UrbanBuiltIndexUBI_9');
+        map.getPane('pane_UrbanBuiltIndexUBI_9').style.zIndex = 409;
+        var img_UrbanBuiltIndexUBI_9 = 'data/UrbanBuiltIndexUBI_9.png';
+        var img_bounds_UrbanBuiltIndexUBI_9 = [[-6.745966454626388,146.9316145352717],[-6.632123290391205,147.04095803130514]];
+        var layer_UrbanBuiltIndexUBI_9 = new L.imageOverlay(img_UrbanBuiltIndexUBI_9,
+                                              img_bounds_UrbanBuiltIndexUBI_9,
+                                              {pane: 'pane_UrbanBuiltIndexUBI_9'});
+        bounds_group.addLayer(layer_UrbanBuiltIndexUBI_9);
+        map.addLayer(layer_UrbanBuiltIndexUBI_9);
+        function pop_50M_Contour_NASA_DEM_10(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['VALUE'] !== null ? autolinker.link(String(feature.properties['VALUE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
 
-        
-        var title = L.control({position: 'topleft'});
-        title.onAdd = function () {
-            var div = L.DomUtil.create('div', 'info');
+        function style_50M_Contour_NASA_DEM_10_0() {
+            return {
+                pane: 'pane_50M_Contour_NASA_DEM_10',
+                opacity: 1,
+                color: 'rgba(255,127,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+        }
+        map.createPane('pane_50M_Contour_NASA_DEM_10');
+        map.getPane('pane_50M_Contour_NASA_DEM_10').style.zIndex = 410;
+        map.getPane('pane_50M_Contour_NASA_DEM_10').style['mix-blend-mode'] = 'normal';
+        var layer_50M_Contour_NASA_DEM_10 = new L.geoJson(json_50M_Contour_NASA_DEM_10, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_50M_Contour_NASA_DEM_10',
+            layerName: 'layer_50M_Contour_NASA_DEM_10',
+            pane: 'pane_50M_Contour_NASA_DEM_10',
+            onEachFeature: pop_50M_Contour_NASA_DEM_10,
+            style: style_50M_Contour_NASA_DEM_10_0,
+        });
+        bounds_group.addLayer(layer_50M_Contour_NASA_DEM_10);
+        map.addLayer(layer_50M_Contour_NASA_DEM_10);
+        function pop_20M_Contour_NASA_DEM_11(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['VALUE'] !== null ? autolinker.link(String(feature.properties['VALUE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_20M_Contour_NASA_DEM_11_0() {
+            return {
+                pane: 'pane_20M_Contour_NASA_DEM_11',
+                opacity: 1,
+                color: 'rgba(255,127,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+        }
+        map.createPane('pane_20M_Contour_NASA_DEM_11');
+        map.getPane('pane_20M_Contour_NASA_DEM_11').style.zIndex = 411;
+        map.getPane('pane_20M_Contour_NASA_DEM_11').style['mix-blend-mode'] = 'normal';
+        var layer_20M_Contour_NASA_DEM_11 = new L.geoJson(json_20M_Contour_NASA_DEM_11, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_20M_Contour_NASA_DEM_11',
+            layerName: 'layer_20M_Contour_NASA_DEM_11',
+            pane: 'pane_20M_Contour_NASA_DEM_11',
+            onEachFeature: pop_20M_Contour_NASA_DEM_11,
+            style: style_20M_Contour_NASA_DEM_11_0,
+        });
+        bounds_group.addLayer(layer_20M_Contour_NASA_DEM_11);
+        map.addLayer(layer_20M_Contour_NASA_DEM_11);
+        function pop_LAE_CADASTRAL_2010_NO_DATUM_12(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Layer'] !== null ? autolinker.link(String(feature.properties['Layer']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['PaperSpace'] !== null ? autolinker.link(String(feature.properties['PaperSpace']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SubClasses'] !== null ? autolinker.link(String(feature.properties['SubClasses']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Linetype'] !== null ? autolinker.link(String(feature.properties['Linetype']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['EntityHand'] !== null ? autolinker.link(String(feature.properties['EntityHand']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Text'] !== null ? autolinker.link(String(feature.properties['Text']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_LAE_CADASTRAL_2010_NO_DATUM_12_0() {
+            return {
+                pane: 'pane_LAE_CADASTRAL_2010_NO_DATUM_12',
+                opacity: 1,
+                color: 'rgba(253,230,39,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+        }
+        map.createPane('pane_LAE_CADASTRAL_2010_NO_DATUM_12');
+        map.getPane('pane_LAE_CADASTRAL_2010_NO_DATUM_12').style.zIndex = 412;
+        map.getPane('pane_LAE_CADASTRAL_2010_NO_DATUM_12').style['mix-blend-mode'] = 'normal';
+        var layer_LAE_CADASTRAL_2010_NO_DATUM_12 = new L.geoJson(json_LAE_CADASTRAL_2010_NO_DATUM_12, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_LAE_CADASTRAL_2010_NO_DATUM_12',
+            layerName: 'layer_LAE_CADASTRAL_2010_NO_DATUM_12',
+            pane: 'pane_LAE_CADASTRAL_2010_NO_DATUM_12',
+            onEachFeature: pop_LAE_CADASTRAL_2010_NO_DATUM_12,
+            style: style_LAE_CADASTRAL_2010_NO_DATUM_12_0,
+        });
+        bounds_group.addLayer(layer_LAE_CADASTRAL_2010_NO_DATUM_12);
+        map.addLayer(layer_LAE_CADASTRAL_2010_NO_DATUM_12);
+        function pop_WATERWAYS_OSM_CLIPPED_13(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['osm_id'] !== null ? autolinker.link(String(feature.properties['osm_id']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['osm_way_id'] !== null ? autolinker.link(String(feature.properties['osm_way_id']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['natural'] !== null ? autolinker.link(String(feature.properties['natural']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['name'] !== null ? autolinker.link(String(feature.properties['name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['wikidata'] !== null ? autolinker.link(String(feature.properties['wikidata']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['wikipedia'] !== null ? autolinker.link(String(feature.properties['wikipedia']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_WATERWAYS_OSM_CLIPPED_13_0() {
+            return {
+                pane: 'pane_WATERWAYS_OSM_CLIPPED_13',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(166,206,227,1.0)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_WATERWAYS_OSM_CLIPPED_13');
+        map.getPane('pane_WATERWAYS_OSM_CLIPPED_13').style.zIndex = 413;
+        map.getPane('pane_WATERWAYS_OSM_CLIPPED_13').style['mix-blend-mode'] = 'normal';
+        var layer_WATERWAYS_OSM_CLIPPED_13 = new L.geoJson(json_WATERWAYS_OSM_CLIPPED_13, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_WATERWAYS_OSM_CLIPPED_13',
+            layerName: 'layer_WATERWAYS_OSM_CLIPPED_13',
+            pane: 'pane_WATERWAYS_OSM_CLIPPED_13',
+            onEachFeature: pop_WATERWAYS_OSM_CLIPPED_13,
+            style: style_WATERWAYS_OSM_CLIPPED_13_0,
+        });
+        bounds_group.addLayer(layer_WATERWAYS_OSM_CLIPPED_13);
+        map.addLayer(layer_WATERWAYS_OSM_CLIPPED_13);
+        function pop_BASIC_ROAD_OSM_CLIPPED_14(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['osm_id'] !== null ? autolinker.link(String(feature.properties['osm_id']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['name'] !== null ? autolinker.link(String(feature.properties['name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ref'] !== null ? autolinker.link(String(feature.properties['ref']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['type'] !== null ? autolinker.link(String(feature.properties['type']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Shape_Leng'] !== null ? autolinker.link(String(feature.properties['Shape_Leng']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_BASIC_ROAD_OSM_CLIPPED_14_0() {
+            return {
+                pane: 'pane_BASIC_ROAD_OSM_CLIPPED_14',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+        }
+        function style_BASIC_ROAD_OSM_CLIPPED_14_1() {
+            return {
+                pane: 'pane_BASIC_ROAD_OSM_CLIPPED_14',
+                opacity: 1,
+                color: 'rgba(238,238,238,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+        }
+        map.createPane('pane_BASIC_ROAD_OSM_CLIPPED_14');
+        map.getPane('pane_BASIC_ROAD_OSM_CLIPPED_14').style.zIndex = 414;
+        map.getPane('pane_BASIC_ROAD_OSM_CLIPPED_14').style['mix-blend-mode'] = 'normal';
+        var layer_BASIC_ROAD_OSM_CLIPPED_14 = new L.geoJson.multiStyle(json_BASIC_ROAD_OSM_CLIPPED_14, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_BASIC_ROAD_OSM_CLIPPED_14',
+            layerName: 'layer_BASIC_ROAD_OSM_CLIPPED_14',
+            pane: 'pane_BASIC_ROAD_OSM_CLIPPED_14',
+            onEachFeature: pop_BASIC_ROAD_OSM_CLIPPED_14,
+            styles: [style_BASIC_ROAD_OSM_CLIPPED_14_0,style_BASIC_ROAD_OSM_CLIPPED_14_1,]
+        });
+        bounds_group.addLayer(layer_BASIC_ROAD_OSM_CLIPPED_14);
+        map.addLayer(layer_BASIC_ROAD_OSM_CLIPPED_14);
+        function pop_BUILDINGS_OSM_CLIPPED_15(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['osm_id'] !== null ? autolinker.link(String(feature.properties['osm_id']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['osm_way_id'] !== null ? autolinker.link(String(feature.properties['osm_way_id']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['building'] !== null ? autolinker.link(String(feature.properties['building']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['name'] !== null ? autolinker.link(String(feature.properties['name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['office'] !== null ? autolinker.link(String(feature.properties['office']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['shop'] !== null ? autolinker.link(String(feature.properties['shop']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['place'] !== null ? autolinker.link(String(feature.properties['place']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['tourism'] !== null ? autolinker.link(String(feature.properties['tourism']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['leisure'] !== null ? autolinker.link(String(feature.properties['leisure']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['amenity'] !== null ? autolinker.link(String(feature.properties['amenity']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['wikidata'] !== null ? autolinker.link(String(feature.properties['wikidata']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['wikipedia'] !== null ? autolinker.link(String(feature.properties['wikipedia']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_BUILDINGS_OSM_CLIPPED_15_0() {
+            return {
+                pane: 'pane_BUILDINGS_OSM_CLIPPED_15',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,0,0,1.0)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_BUILDINGS_OSM_CLIPPED_15');
+        map.getPane('pane_BUILDINGS_OSM_CLIPPED_15').style.zIndex = 415;
+        map.getPane('pane_BUILDINGS_OSM_CLIPPED_15').style['mix-blend-mode'] = 'normal';
+        var layer_BUILDINGS_OSM_CLIPPED_15 = new L.geoJson(json_BUILDINGS_OSM_CLIPPED_15, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_BUILDINGS_OSM_CLIPPED_15',
+            layerName: 'layer_BUILDINGS_OSM_CLIPPED_15',
+            pane: 'pane_BUILDINGS_OSM_CLIPPED_15',
+            onEachFeature: pop_BUILDINGS_OSM_CLIPPED_15,
+            style: style_BUILDINGS_OSM_CLIPPED_15_0,
+        });
+        bounds_group.addLayer(layer_BUILDINGS_OSM_CLIPPED_15);
+        map.addLayer(layer_BUILDINGS_OSM_CLIPPED_15);
+        map.createPane('pane_NASA_DEM_30M_16');
+        map.getPane('pane_NASA_DEM_30M_16').style.zIndex = 416;
+        var img_NASA_DEM_30M_16 = 'data/NASA_DEM_30M_16.png';
+        var img_bounds_NASA_DEM_30M_16 = [[-6.745941872920377,146.93162450567303],[-6.632145507865763,147.04091696482195]];
+        var layer_NASA_DEM_30M_16 = new L.imageOverlay(img_NASA_DEM_30M_16,
+                                              img_bounds_NASA_DEM_30M_16,
+                                              {pane: 'pane_NASA_DEM_30M_16'});
+        bounds_group.addLayer(layer_NASA_DEM_30M_16);
+        map.addLayer(layer_NASA_DEM_30M_16);
+        function pop_FLOWPATHSOLFP_17(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DN'] !== null ? autolinker.link(String(feature.properties['DN']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_FLOWPATHSOLFP_17_0() {
+            return {
+                pane: 'pane_FLOWPATHSOLFP_17',
+                opacity: 1,
+                color: 'rgba(206,230,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 4.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(206,230,247,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_FLOWPATHSOLFP_17');
+        map.getPane('pane_FLOWPATHSOLFP_17').style.zIndex = 417;
+        map.getPane('pane_FLOWPATHSOLFP_17').style['mix-blend-mode'] = 'normal';
+        var layer_FLOWPATHSOLFP_17 = new L.geoJson(json_FLOWPATHSOLFP_17, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_FLOWPATHSOLFP_17',
+            layerName: 'layer_FLOWPATHSOLFP_17',
+            pane: 'pane_FLOWPATHSOLFP_17',
+            onEachFeature: pop_FLOWPATHSOLFP_17,
+            style: style_FLOWPATHSOLFP_17_0,
+        });
+        bounds_group.addLayer(layer_FLOWPATHSOLFP_17);
+        map.addLayer(layer_FLOWPATHSOLFP_17);
+        map.createPane('pane_5M_FLOODPLAIN_CLIPPED_18');
+        map.getPane('pane_5M_FLOODPLAIN_CLIPPED_18').style.zIndex = 418;
+        var img_5M_FLOODPLAIN_CLIPPED_18 = 'data/5M_FLOODPLAIN_CLIPPED_18.png';
+        var img_bounds_5M_FLOODPLAIN_CLIPPED_18 = [[-6.746049507865139,146.93138916952648],[-6.631895179982202,147.04111139169046]];
+        var layer_5M_FLOODPLAIN_CLIPPED_18 = new L.imageOverlay(img_5M_FLOODPLAIN_CLIPPED_18,
+                                              img_bounds_5M_FLOODPLAIN_CLIPPED_18,
+                                              {pane: 'pane_5M_FLOODPLAIN_CLIPPED_18'});
+        bounds_group.addLayer(layer_5M_FLOODPLAIN_CLIPPED_18);
+        map.addLayer(layer_5M_FLOODPLAIN_CLIPPED_18);
+        function pop_STUDYAREABOUNDARY_19(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Title</th>\
+                        <td>' + (feature.properties['Title'] !== null ? autolinker.link(String(feature.properties['Title']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['auxiliary_storage_labeling_lineanchorpercent'] !== null ? autolinker.link(String(feature.properties['auxiliary_storage_labeling_lineanchorpercent']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['auxiliary_storage_labeling_lineanchorclipping'] !== null ? autolinker.link(String(feature.properties['auxiliary_storage_labeling_lineanchorclipping']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['auxiliary_storage_labeling_lineanchortype'] !== null ? autolinker.link(String(feature.properties['auxiliary_storage_labeling_lineanchortype']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['auxiliary_storage_labeling_lineanchortextpoint'] !== null ? autolinker.link(String(feature.properties['auxiliary_storage_labeling_lineanchortextpoint']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_STUDYAREABOUNDARY_19_0() {
+            return {
+                pane: 'pane_STUDYAREABOUNDARY_19',
+                opacity: 1,
+                color: 'rgba(227,26,28,1.0)',
+                dashArray: '16.0,8.0',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+        }
+        map.createPane('pane_STUDYAREABOUNDARY_19');
+        map.getPane('pane_STUDYAREABOUNDARY_19').style.zIndex = 419;
+        map.getPane('pane_STUDYAREABOUNDARY_19').style['mix-blend-mode'] = 'normal';
+        var layer_STUDYAREABOUNDARY_19 = new L.geoJson(json_STUDYAREABOUNDARY_19, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_STUDYAREABOUNDARY_19',
+            layerName: 'layer_STUDYAREABOUNDARY_19',
+            pane: 'pane_STUDYAREABOUNDARY_19',
+            onEachFeature: pop_STUDYAREABOUNDARY_19,
+            style: style_STUDYAREABOUNDARY_19_0,
+        });
+        bounds_group.addLayer(layer_STUDYAREABOUNDARY_19);
+        map.addLayer(layer_STUDYAREABOUNDARY_19);
+        var overlaysTree = [
+            {label: '<img src="legend/STUDYAREABOUNDARY_19.png" /> STUDY AREA BOUNDARY', layer: layer_STUDYAREABOUNDARY_19},
+        {label: '<b>HYDROLOGY (LOW RES)</b>', collapsed: true, selectAllCheckbox: true, children: [
+            {label: "5M_FLOODPLAIN_CLIPPED", layer: layer_5M_FLOODPLAIN_CLIPPED_18},
+            {label: '<img src="legend/FLOWPATHSOLFP_17.png" /> FLOW PATHS (OLFP) ', layer: layer_FLOWPATHSOLFP_17},
+            {label: "NASA_DEM_30M", layer: layer_NASA_DEM_30M_16},]},
+        {label: '<b>OPEN STREET MAP (OSM) DATA</b>', collapsed: true, selectAllCheckbox: true, children: [
+            {label: '<img src="legend/BUILDINGS_OSM_CLIPPED_15.png" /> BUILDINGS_OSM_CLIPPED', layer: layer_BUILDINGS_OSM_CLIPPED_15},
+            {label: '<img src="legend/BASIC_ROAD_OSM_CLIPPED_14.png" /> BASIC_ROAD_OSM_CLIPPED', layer: layer_BASIC_ROAD_OSM_CLIPPED_14},
+            {label: '<img src="legend/WATERWAYS_OSM_CLIPPED_13.png" /> WATERWAYS_OSM_CLIPPED', layer: layer_WATERWAYS_OSM_CLIPPED_13},]},
+            {label: '<img src="legend/LAE_CADASTRAL_2010_NO_DATUM_12.png" /> LAE_CADASTRAL_2010_NO_DATUM', layer: layer_LAE_CADASTRAL_2010_NO_DATUM_12},
+        {label: '<b>CONTOURS @ 30M</b>', collapsed: true, selectAllCheckbox: true, children: [
+            {label: '<img src="legend/20M_Contour_NASA_DEM_11.png" /> 20M_Contour_NASA_DEM', layer: layer_20M_Contour_NASA_DEM_11},
+            {label: '<img src="legend/50M_Contour_NASA_DEM_10.png" /> 50M_Contour_NASA_DEM', layer: layer_50M_Contour_NASA_DEM_10},]},
+        {label: '<b>LANDUSE ANALYSIS (COPERNICUS DATA)</b>', collapsed: true, selectAllCheckbox: true, children: [
+            {label: "Urban Built-Index (UBI)", layer: layer_UrbanBuiltIndexUBI_9},
+            {label: "Normalised Difference Water Index (NDWI)", layer: layer_NormalisedDifferenceWaterIndexNDWI_8},
+            {label: "Normalised Difference Vegetation Index (NDVI)", layer: layer_NormalisedDifferenceVegetationIndexNDVI_7},
+            {label: "Green Chlorophyll Index (GCI)", layer: layer_GreenChlorophyllIndexGCI_6},
+            {label: "Simple RGB Ratio (SR)", layer: layer_SimpleRGBRatioSR_5},]},
+        {label: '<b>RGB_CLIPPED_10M</b>', collapsed: true, selectAllCheckbox: true, children: [
+            {label: "B4_RED_RGB_CLIPPED", layer: layer_B4_RED_RGB_CLIPPED_4},
+            {label: "B3_GREEN_RGB_CLIPPED", layer: layer_B3_GREEN_RGB_CLIPPED_3},
+            {label: "B2_BLUE_RGB_CLIPPED", layer: layer_B2_BLUE_RGB_CLIPPED_2},
+            {label: "B8_INFRA-RED_CLIPPED", layer: layer_B8_INFRARED_CLIPPED_1},]},
+            {label: "AERIAL_TRUE COLOUR_10M", layer: layer_AERIAL_TRUECOLOUR_10M_0},]
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            //namedToggle: true,
+            //selectorBack: false,
+            //closedSymbol: '&#8862; &#x1f5c0;',
+            //openedSymbol: '&#8863; &#x1f5c1;',
+            //collapseAll: 'Collapse all',
+            //expandAll: 'Expand all',
+            collapsed: true,
+        });
+        lay.addTo(map);
+        setBounds();
+        L.ImageOverlay.include({
+            getBounds: function () {
+                return this._bounds;
+            }
+        });
+        resetLabels([layer_50M_Contour_NASA_DEM_10,layer_STUDYAREABOUNDARY_19]);
+        map.on("zoomend", function(){
+            resetLabels([layer_50M_Contour_NASA_DEM_10,layer_STUDYAREABOUNDARY_19]);
+        });
+        map.on("layeradd", function(){
+            resetLabels([layer_50M_Contour_NASA_DEM_10,layer_STUDYAREABOUNDARY_19]);
+        });
+        map.on("layerremove", function(){
+            resetLabels([layer_50M_Contour_NASA_DEM_10,layer_STUDYAREABOUNDARY_19]);
+        });
+        </script>        
+    </body>
+</html>
