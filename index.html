@@ -13,22 +13,18 @@
         <link rel="stylesheet" href="css/leaflet.photon.css">
         <link rel="stylesheet" href="css/leaflet-measure.css">
         <style>
-       html, body, #map {
-  overflow: hidden;
-  width: 100%;
-}
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
         }
         </style>
         <title>Basic Land Use Analysis - Lae Urban </title>
     </head>
     <body>
-		
-		<div id="map"></div>
-<script src="js/leaflet-measure.js"></script>
-<script src="data/50M_Contour_NASA_DEM_10.js"></script>
-<script src="data/20M_Contour_NASA_DEM_11.js"></script>
-
-        <div id="map"></div>
+        <div id="map">
+        </div>
         <script src="js/qgis2web_expressions.js"></script>
         <script src="js/leaflet.js"></script>
         <script src="js/L.Control.Layers.Tree.min.js"></script>
@@ -50,7 +46,6 @@
         <script src="data/BUILDINGS_OSM_CLIPPED_15.js"></script>
         <script src="data/FLOWPATHSOLFP_17.js"></script>
         <script src="data/STUDYAREABOUNDARY_19.js"></script>
-
         <script>
         var map = L.map('map', {
             zoomControl:false, maxZoom:28, minZoom:1
@@ -119,9 +114,7 @@
                 popup._contentNode.classList.remove('media');
             }
         }
-var map = L.map('map').setView([lat, lng], zoom);
-
-			var title = new L.Control({'position':'topleft'});
+        var title = new L.Control({'position':'topleft'});
         title.onAdd = function (map) {
             this._div = L.DomUtil.create('div', 'info');
             this.update();
