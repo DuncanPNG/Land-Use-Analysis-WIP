@@ -241,20 +241,47 @@ var layer_FLOWPATHSOLFP_17 = new L.geoJson(json_FLOWPATHSOLFP_17, {style: {color
 bounds_group.addLayer(layer_FLOWPATHSOLFP_17);
 
         // ✅ Legend Tree
-        var overlaysTree = [
-            {label: 'Study Area Boundary', layer: layer_STUDYAREABOUNDARY_19},
-            {label: 'Aerial True Colour', layer: layer_AERIAL_TRUECOLOUR_10M_0},
-            {label: 'NDVI', layer: layer_NormalisedDifferenceVegetationIndexNDVI_7},
-            {label: 'UBI', layer: layer_UrbanBuiltIndexUBI_9},
-            {label: 'Floodplain', layer: layer_5M_FLOODPLAIN_CLIPPED_18},
-            {label: 'OSM Roads', layer: layer_BASIC_ROAD_OSM_CLIPPED_14},
-            {label: 'OSM Buildings', layer: layer_BUILDINGS_OSM_CLIPPED_15},
-            {label: 'Contours 20m', layer: layer_20M_Contour_NASA_DEM_11},
-            {label: 'Contours 50m', layer: layer_50M_Contour_NASA_DEM_10}
-        ];
-        var lay = L.control.layers.tree(null, overlaysTree, {collapsed: true});
-        lay.addTo(map);
+        
+var overlaysTree = [
+    {label: '<img src="legend/STUDYAREABOUNDARY_19.png" /> STUDY AREA BOUNDARY', layer: layer_STUDYAREABOUNDARY_19},
+    {label: '<b>HYDROLOGY (LOW RES)</b>', collapsed: true, selectAllCheckbox: true, children: [
+        {label: '5M_FLOODPLAIN_CLIPPED', layer: layer_5M_FLOODPLAIN_CLIPPED_18},
+        {label: '<img src="legend/FLOWPATHSOLFP_17.png" /> FLOW PATHS (OLFP)', layer: layer_FLOWPATHSOLFP_17},
+        {label: 'NASA_DEM_30M', layer: layer_NASA_DEM_30M_16}
+    ]},
+    {label: '<b>OPEN STREET MAP (OSM) DATA</b>', collapsed: true, selectAllCheckbox: true, children: [
+        {label: '<img src="legend/BUILDINGS_OSM_CLIPPED_15.png" /> BUILDINGS_OSM_CLIPPED', layer: layer_BUILDINGS_OSM_CLIPPED_15},
+        {label: '<img src="legend/BASIC_ROAD_OSM_CLIPPED_14.png" /> BASIC_ROAD_OSM_CLIPPED', layer: layer_BASIC_ROAD_OSM_CLIPPED_14},
+        {label: '<img src="legend/WATERWAYS_OSM_CLIPPED_13.png" /> WATERWAYS_OSM_CLIPPED', layer: layer_WATERWAYS_OSM_CLIPPED_13}
+    ]},
+    {label: '<img src="legend/LAE_CADASTRAL_2010_NO_DATUM_12.png" /> LAE_CADASTRAL_2010_NO_DATUM', layer: layer_LAE_CADASTRAL_2010_NO_DATUM_12},
+    {label: '<b>CONTOURS @ 30M</b>', collapsed: true, selectAllCheckbox: true, children: [
+        {label: '<img src="legend/20M_Contour_NASA_DEM_11.png" /> 20M_Contour_NASA_DEM', layer: layer_20M_Contour_NASA_DEM_11},
+        {label: '<img src="legend/50M_Contour_NASA_DEM_10.png" /> 50M_Contour_NASA_DEM', layer: layer_50M_Contour_NASA_DEM_10}
+    ]},
+    {label: '<b>LANDUSE ANALYSIS (COPERNICUS DATA)</b>', collapsed: true, selectAllCheckbox: true, children: [
+        {label: 'Urban Built-Index (UBI)', layer: layer_UrbanBuiltIndexUBI_9},
+        {label: 'Normalised Difference Water Index (NDWI)', layer: layer_NormalisedDifferenceWaterIndexNDWI_8},
+        {label: 'Normalised Difference Vegetation Index (NDVI)', layer: layer_NormalisedDifferenceVegetationIndexNDVI_7},
+        {label: 'Green Chlorophyll Index (GCI)', layer: layer_GreenChlorophyllIndexGCI_6},
+        {label: 'Simple RGB Ratio (SR)', layer: layer_SimpleRGBRatioSR_5}
+    ]},
+    {label: '<b>RGB_CLIPPED_10M</b>', collapsed: true, selectAllCheckbox: true, children: [
+        {label: 'B4_RED_RGB_CLIPPED', layer: layer_B4_RED_RGB_CLIPPED_4},
+        {label: 'B3_GREEN_RGB_CLIPPED', layer: layer_B3_GREEN_RGB_CLIPPED_3},
+        {label: 'B2_BLUE_RGB_CLIPPED', layer: layer_B2_BLUE_RGB_CLIPPED_2},
+        {label: 'B8_INFRA-RED_CLIPPED', layer: layer_B8_INFRARED_CLIPPED_1}
+    ]},
+    {label: 'AERIAL_TRUE COLOUR_10M', layer: layer_AERIAL_TRUECOLOUR_10M_0}
+];
 
+var lay = L.control.layers.tree(null, overlaysTree, {
+    collapsed: true
+});
+lay.addTo(map);
+
+        map.addLayer(layer_AERIAL_TRUECOLOUR_10M_0); // Show this layer initially
+       
         if (bounds_group.getLayers().length) {
             map.fitBounds(bounds_group.getBounds());
         }
